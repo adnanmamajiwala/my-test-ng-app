@@ -5,9 +5,13 @@ import {AppComponent} from './app.component';
 import {Http, HttpModule, JsonpModule} from '@angular/http';
 import {ConfigService} from './services/config.service';
 
+function configServiceFactory(config: ConfigService) {
+  return () => config.load().then();
+}
+
 @NgModule({
   declarations: [
-    AppComponent,
+    AppComponent
   ],
   imports: [
     BrowserModule,
@@ -18,7 +22,7 @@ import {ConfigService} from './services/config.service';
     ConfigService,
     {
       provide: APP_INITIALIZER,
-      useFactory: (config: ConfigService) => () => config.load(),
+      useFactory: configServiceFactory,
       deps: [ConfigService, Http],
       multi: true
     }

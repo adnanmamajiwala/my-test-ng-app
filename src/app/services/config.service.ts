@@ -4,26 +4,34 @@ import {Http} from '@angular/http';
 
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/toPromise';
 
 @Injectable()
 export class ConfigService {
 
-  private config: Config;
+  static configuration: Config;
+  private _config: Config;
 
   constructor(private http: Http) {
   }
 
-  load(): Promise<Config> {
-    this.http.get('https://jsonplaceholder.typicode.com/posts/1')
-      .map(res => res.json())
-      .subscribe((env_data) => {
-        this.config = env_data;
-        console.log(env_data);
-      });
-    return Promise.resolve(this.config);
+  load(): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+
+      this.http.get('https://jsonplaceholder.typicode.com/posts/1')
+        .map(res => res.json())
+        .subscribe((env_data) => {
+          this._config = env_data;
+          ConfigService.configuration = env_data;
+          console.log('Inside ConfigService.load.subscribe =>' + JSON.stringify(this._config));
+          resolve(true);
+        });
+    });
   }
 
-  getConfig(): Config {
-    return this.config;
+
+  get config(): Config {
+    return this._config;
   }
+
 }
